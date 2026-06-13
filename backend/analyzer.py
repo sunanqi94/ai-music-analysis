@@ -378,8 +378,8 @@ def full_analysis(path):
         notes.append('I-V-vi-IV progression')
     mood = {'C':'bright','G':'warm','Am':'soft','F':'open'}.get(chords[0],'neutral') if chords else 'neutral'
     notes.append('Mood: ' + mood)
-     waveform = extract_waveform(y)
-     return {'success':True,'filename':os.path.basename(path),'duration':round(dur,1),'sample_rate':sr,
+    waveform = extract_waveform(y)
+    return {'success':True,'filename':os.path.basename(path),'duration':round(dur,1),'sample_rate':sr,
             'genre':genre,'genre_confidence':gc,'genre_distribution':gd,
             'tempo':bpm,'key':key,'mode':mode,'key_display':kd,
             'chords':chords,'chord_progression':cs,
@@ -387,12 +387,13 @@ def full_analysis(path):
             'bpm_method':'flux+acorr',
             'chord_templates':'%d chords' % len(_build_chord_library()),
             'note_distribution':nd,'analysis_notes':notes,
-             'melody':melody,'melody_segments':len(melody),
-             'waveform':waveform,
-             'format_supported':supported_formats()[0],
+            'melody':melody,'melody_segments':len(melody),
+            'waveform':waveform,
+            'format_supported':supported_formats()[0],
             'mp3_supported':supported_formats()[1],
             'engine':'v3 improved chroma'}
- def extract_waveform(y, num_points=500):
+
+def extract_waveform(y, num_points=500):
      if len(y) == 0:
          return [0.0] * num_points
      step = max(1, len(y) // num_points)

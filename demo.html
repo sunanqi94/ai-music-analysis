@@ -1,0 +1,120 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AI Music Analysis Demo</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+body{background:#F5F5F7;color:#1D1D1F;min-height:100vh}
+.app{width:100%;max-width:420px;min-height:100vh;margin:0 auto;background:#F5F5F7;position:relative;overflow-x:hidden}
+@media(min-width:500px){body{display:flex;align-items:center;justify-content:center;padding:20px;background:#E8E8ED}.app{min-height:780px;max-height:780px;border-radius:30px;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.1)}}
+.page{display:none;flex-direction:column;padding:0 0 20px}
+.page.active{display:flex;animation:fadeUp .4s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.08)}}
+@keyframes wave{0%{height:4px}50%{height:20px}100%{height:4px}}
+.scroll{flex:1;overflow-y:auto;padding:0 20px 24px}
+.hdr{display:flex;align-items:center;gap:10px;padding:14px 20px 6px;position:sticky;top:0;z-index:10;background:#F5F5F7}
+.hdr h2{font-size:18px;font-weight:600;flex:1}
+.bk{background:none;border:none;font-size:22px;color:#1D1D1F;cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px}
+.bk:active{background:#E8E8ED}
+/* Home */
+.hm{display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:100vh;padding:40px 28px;text-align:center}
+.hi{font-size:72px;margin-bottom:12px}
+.ht{font-size:26px;font-weight:700;margin-bottom:8px;background:linear-gradient(135deg,#6C5CE7,#A29BFE);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hs{font-size:14px;color:#86868B;margin-bottom:36px;line-height:1.6}
+.bg{width:100%;max-width:280px;display:flex;flex-direction:column;gap:10px}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px 20px;border-radius:14px;border:none;font-size:15px;font-weight:500;cursor:pointer}
+.btn:active{transform:scale(.97)}
+.bp{background:linear-gradient(135deg,#6C5CE7,#A29BFE);color:#fff;box-shadow:0 4px 16px rgba(108,92,231,.25)}
+.bs{background:#fff;color:#1D1D1F;box-shadow:0 2px 8px rgba(0,0,0,.06);border:1px solid #E8E8ED}
+.bs .rc{color:#FF4757}
+.dv{color:#C8C8CC;font-size:12px;margin:2px 0}
+.hf{font-size:11px;color:#C8C8CC;margin-top:24px}
+/* Loading */
+.lw{display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:100vh;padding:40px 28px;text-align:center}
+.li{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#6C5CE7,#A29BFE);display:flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:20px;animation:pulse 1.5s infinite}
+.lt{font-size:17px;font-weight:600;margin-bottom:4px}
+.ls{font-size:13px;color:#86868B;margin-bottom:28px}
+.pt{width:200px;height:3px;background:#E8E8ED;border-radius:99px;overflow:hidden;margin-bottom:24px}
+.pf{height:100%;background:linear-gradient(90deg,#6C5CE7,#A29BFE);border-radius:99px}
+.sl{text-align:left;font-size:13px;width:200px}
+.sl div{padding:5px 0;display:flex;align-items:center;gap:8px}
+.sl .dn{color:#6C5CE7}.sl .dg{color:#1D1D1F;font-weight:500}.sl .pd{color:#C8C8CC}
+/* Card */
+.cd{background:#fff;border-radius:18px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.05);margin-bottom:16px}
+.wv{height:64px;border-radius:10px;margin-bottom:14px;display:flex;align-items:flex-end;gap:3px;padding:0 4px}
+.wv span{width:5px;border-radius:99px;background:linear-gradient(180deg,#6C5CE7,#A29BFE);flex:1}
+.tr{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.tg{background:#F0EEFF;color:#6C5CE7;font-weight:500;padding:3px 10px;border-radius:99px;font-size:12px}
+.mr{display:flex;gap:16px;margin-bottom:8px}
+.mi{font-size:12px;color:#86868B;text-align:center}
+.mi strong{color:#1D1D1F;display:block;font-size:16px;font-weight:600}
+.cl{font-size:13px;color:#86868B;padding-top:10px;border-top:1px solid #F0F0F0;margin-top:4px}
+.cl strong{color:#1D1D1F}
+.ms{font-size:12px;color:#86868B;margin-bottom:8px;margin-top:2px;font-weight:500}
+.mn{display:flex;align-items:center;justify-content:space-between;background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:7px;cursor:pointer;border:1px solid #F0F0F0}
+.mn:active{transform:scale(.98)}
+.ml{display:flex;align-items:center;gap:12px}
+.mi2{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.mt h4{font-size:14px;font-weight:600;margin-bottom:1px}
+.mt p{font-size:11px;color:#86868B}
+.ma{color:#C8C8CC;font-size:18px}
+.ip{background:#F0EEFF}.ig{background:#E8F8F0}.io{background:#FFF3E8}.ib{background:#E8F0FF}
+/* Detail */
+.dc{background:#fff;border-radius:18px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.05);margin-bottom:12px}
+.dc h3{font-size:15px;font-weight:600;margin-bottom:10px}
+.dc p{font-size:13px;color:#555;line-height:1.6}
+.db{display:inline-block;padding:5px 14px;border-radius:99px;font-size:13px;font-weight:500;background:#F0EEFF;color:#6C5CE7;margin:3px}
+.br{display:flex;align-items:center;gap:10px;margin:6px 0}
+.br .lb{font-size:12px;color:#86868B;width:70px;flex-shrink:0;text-align:right}
+.br .tk{flex:1;height:5px;background:#E8E8ED;border-radius:99px;overflow:hidden}
+.br .fl{height:100%;border-radius:99px;background:linear-gradient(90deg,#6C5CE7,#A29BFE)}
+.br .pc{font-size:12px;color:#6C5CE7;width:32px;text-align:right}
+.sb{background:#FAFAFA;border-radius:12px;padding:16px;text-align:center;font-size:15px;line-height:1.8;min-height:70px;display:flex;align-items:center;justify-content:center;color:#333}
+.tg2{display:flex;gap:6px;margin-bottom:10px}
+.tb{padding:5px 14px;border-radius:99px;border:1px solid #E8E8ED;background:#fff;font-size:12px;cursor:pointer;color:#86868B}
+.tb.on{background:#6C5CE7;color:#fff;border-color:#6C5CE7}
+.cv{display:flex;height:48px;border-radius:10px;overflow:hidden;margin:10px 0}
+.cv div{display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:14px}
+.tl{display:flex;font-size:10px;color:#86868B;margin-bottom:8px}
+.ex{display:flex;gap:8px}
+.eb{flex:1;padding:10px;border-radius:10px;border:1px solid #E8E8ED;background:#fff;font-size:13px;cursor:pointer;text-align:center}
+/* Record */
+.rw{display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:100vh;padding:40px 28px;text-align:center}
+.rb{width:88px;height:88px;border-radius:50%;border:none;background:linear-gradient(135deg,#FF4757,#FF6B81);color:#fff;font-size:36px;cursor:pointer;box-shadow:0 6px 24px rgba(255,71,87,.3);margin-bottom:16px}
+.rb:active{transform:scale(.92)}
+.rb.on{animation:pulse 1.2s infinite}
+.rt{font-size:30px;font-weight:300;margin-bottom:12px}
+.rwv{display:flex;gap:2px;height:32px;align-items:center;margin-bottom:20px}
+.rwv span{width:3px;border-radius:99px;background:linear-gradient(180deg,#6C5CE7,#A29BFE);flex:1}
+.rs{background:#fff;color:#FF4757;border:1px solid #E8E8ED;border-radius:12px;padding:10px 36px;font-size:14px;font-weight:500;cursor:pointer}
+.rh{font-size:12px;color:#86868B;margin-top:12px}
+</style></head><body><div class="app" id="app">
+<div id="ph" class="page active"><div class="hm"><div class="hi">🎵</div><div class="ht">AI 音乐分析助手</div><div class="hs">上传一段音乐，AI 自动识别<br>风格 · 调性 · 和弦 · 乐谱</div><div class="bg"><button class="btn bp" onclick="g('ld')">📁 上传音频文件</button><div class="dv">—— 或 ——</div><button class="btn bs" onclick="g('re')"><span class="rc">🎙</span> 开始录音</button></div><div class="hf">支持 MP3 / WAV / FLAC / M4A · 最大 50MB</div></div></div>
+<div id="pl" class="page"><div class="lw"><div class="li">🎵</div><div class="lt">正在分析你的音乐</div><div class="ls" id="ls">正在识别音乐风格…</div><div class="pt"><div class="pf" id="pf" style="width:10%"></div></div><div class="sl"><div id="s1" class="dg">🎼 识别音乐风格</div><div id="s2" class="pd">🎹 检测调性与音高</div><div id="s3" class="pd">🎸 分析和弦走向</div><div id="s4" class="pd">📜 生成乐谱</div></div></div></div>
+<div id="po" class="page"><div class="hdr"><button class="bk" onclick="g('hm')">&larr;</button><h2>分析概览</h2></div><div class="scroll"><div class="cd" id="ovc"><div class="wv" id="wv"></div><div class="tr"><span class="tg">🎵 流行 · Pop</span><span class="tg">♩ 120 BPM</span><span class="tg">♪ C 大调</span></div><div class="mr"><div class="mi"><strong>流行</strong>风格</div><div class="mi"><strong>120</strong>BPM</div><div class="mi"><strong>C</strong>调性</div></div><div class="cl">核心和弦走向：<strong>C — G — Am — F</strong></div></div><div class="ms">详细分析</div><div class="mn" onclick="g('st')"><div class="ml"><div class="mi2 ip">🎼</div><div class="mt"><h4>风格分析</h4><p>流派识别与风格特征</p></div></div><div class="ma">›</div></div><div class="mn" onclick="g('ky')"><div class="ml"><div class="mi2 ib">🎹</div><div class="mt"><h4>调性与音高</h4><p>主调、调式、音域范围</p></div></div><div class="ma">›</div></div><div class="mn" onclick="g('ch')"><div class="ml"><div class="mi2 io">🎸</div><div class="mt"><h4>和弦走向</h4><p>和弦序列与时序分析</p></div></div><div class="ma">›</div></div><div class="mn" onclick="g('sc')"><div class="ml"><div class="mi2 ig">📜</div><div class="mt"><h4>五线谱 / 简谱</h4><p>旋律线扒谱</p></div></div><div class="ma">›</div></div></div></div>
+<div id="ps" class="page"><div class="hdr"><button class="bk" onclick="g('ov')">&larr;</button><h2>风格分析</h2></div><div class="scroll"><div class="dc"><h3>识别结果</h3><p>综合音频特征分析，本曲主要风格为：</p><div style="margin:12px 0"><span class="db" style="font-size:16px;padding:6px 20px">🎵 流行 · Pop</span></div><p style="font-size:12px;color:#86868B">置信度：95%</p></div>
+<div class="dc"><h3>风格分布</h3><div class="br"><span class="lb">流行</span><div class="tk"><div class="fl" style="width:95%"></div></div><span class="pc">95%</span></div><div class="br"><span class="lb">摇滚</span><div class="tk"><div class="fl" style="width:30%"></div></div><span class="pc">30%</span></div><div class="br"><span class="lb">民谣</span><div class="tk"><div class="fl" style="width:22%"></div></div><span class="pc">22%</span></div></div>
+<div class="dc"><h3>分析要点</h3><p>• 典型的 4/4 拍流行歌曲结构<br>• 主歌-副歌交替，和弦进行简洁<br>• 编曲以吉他/钢琴为主，节奏明快</p></div></div></div>
+<div id="pk" class="page"><div class="hdr"><button class="bk" onclick="g('ov')">&larr;</button><h2>调性与音高</h2></div><div class="scroll"><div class="dc"><h3>主调</h3><div style="margin:10px 0"><span class="db" style="font-size:16px;padding:6px 20px">C 大调</span></div><p style="font-size:12px;color:#86868B">调式：自然大调 · 关系小调：Am</p></div>
+<div class="dc"><h3>音域范围</h3><div style="display:flex;align-items:baseline;gap:8px;margin-bottom:6px"><span style="font-size:30px;font-weight:200">C3</span><span style="color:#86868B">~</span><span style="font-size:30px;font-weight:200">C5</span></div><p style="font-size:12px;color:#86868B">音域跨度：2 个八度</p></div>
+<div class="dc"><h3>音高分布</h3><div class="br"><span class="lb">C</span><div class="tk"><div class="fl" style="width:80%"></div></div><span class="pc">80%</span></div><div class="br"><span class="lb">E</span><div class="tk"><div class="fl" style="width:65%"></div></div><span class="pc">65%</span></div><div class="br"><span class="lb">G</span><div class="tk"><div class="fl" style="width:70%"></div></div><span class="pc">70%</span></div></div></div></div>
+<div id="pc" class="page"><div class="hdr"><button class="bk" onclick="g('ov')">&larr;</button><h2>和弦走向</h2></div><div class="scroll"><div class="dc"><h3>和弦序列</h3><div style="margin:10px 0;display:flex;gap:6px;flex-wrap:wrap"><span class="db" style="font-size:16px;padding:6px 16px">C</span><span class="db">G</span><span class="db">Am</span><span class="db">F</span></div></div>
+<div class="dc"><h3>和弦时序</h3><div class="cv"><div style="flex:3;background:#6C5CE7">C</div><div style="flex:2;background:#A29BFE">G</div><div style="flex:3;background:#6C5CE7">Am</div><div style="flex:2;background:#A29BFE">F</div></div><div class="tl"><div style="flex:3;text-align:center">0:00</div><div style="flex:2;text-align:center">0:25</div><div style="flex:3;text-align:center">0:50</div><div style="flex:2;text-align:center">1:15</div></div></div>
+<div class="dc"><h3>分析要点</h3><p>• 经典 I-V-vi-IV 和弦进行<br>• 流行歌曲中最常见的和弦套路<br>• 整体情绪：明亮、积极</p></div></div></div>
+<div id="psc" class="page"><div class="hdr"><button class="bk" onclick="g('ov')">&larr;</button><h2>乐谱</h2></div><div class="scroll"><div class="dc"><div class="tg2"><button class="tb on" id="tb1" onclick="sw('a')">五线谱</button><button class="tb" id="tb2" onclick="sw('b')">简谱</button></div><div class="sb"><div id="sv">♩ C D E F G A B C<br>♫ 旋律示例片段</div><div id="nv" style="display:none">1 2 3 4 5 6 7 1<br>— — — — — — — —</div></div></div>
+<div class="dc"><h3>旋律摘要</h3><p style="margin-bottom:6px">🎵 C D E F G A B C · 4/4 · ♩ = 120</p></div>
+<div class="dc"><h3>导出</h3><div class="ex"><div class="eb">📥 PDF</div><div class="eb">🎹 MIDI</div></div></div></div></div>
+<div id="pr" class="page"><div class="rw"><button class="rb" id="rb" onclick="rc()">🎙</button><div class="rt" id="rt">00:00</div><div class="rwv" id="rwv"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div><button class="rs" id="rs" style="display:none" onclick="g('ld')">停止录音</button><div class="rh" id="rh">点击按钮开始录音</div></div></div>
+</div>
+<script>
+function g(id){const m={hm:'ph',ld:'pl',ov:'po',st:'ps',ky:'pk',ch:'pc',sc:'psc',re:'pr'};document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));const el=document.getElementById(m[id]||id);el.classList.add('active');if(id=='ld')sl();if(id=='ov')bw();if(id=='re')rr()}
+function sl(){const s=['s1','s2','s3','s4'],ms=['正在识别音乐风格...','正在检测调性与音高...','正在分析和弦走向...','正在生成乐谱...'];const b=document.getElementById('pf');let i=0;s.forEach(id=>document.getElementById(id).className='pd');document.getElementById('s1').className='dg';const iv=setInterval(()=>{i++;if(i>=4){clearInterval(iv);setTimeout(()=>g('ov'),500);return}s.forEach((id,idx)=>{const e=document.getElementById(id);if(idx<i)e.className='dn';if(idx==i)e.className='dg';if(idx>i)e.className='pd'});document.getElementById('ls').textContent=ms[i];b.style.width=((i+1)*25)+'%'},1000)}
+function bw(){const c=document.getElementById('wv');c.innerHTML='';for(let i=0;i<20;i++){const s=document.createElement('span');const h=4+Math.floor(Math.random()*18);const d=(.3+Math.random()*.4).toFixed(2);const dl=(Math.random()*.3).toFixed(2);s.style.cssText=`animation:wave ${d}s ease-in-out infinite alternate;animation-delay:${dl}s;height:${h}px`;c.appendChild(s)}}
+function sw(t){document.getElementById('tb1').className='tb'+(t=='a'?' on':'');document.getElementById('tb2').className='tb'+(t=='b'?' on':'');document.getElementById('sv').style.display=t=='a'?'block':'none';document.getElementById('nv').style.display=t=='b'?'block':'none'}
+let re=false,tm=null,sc=0;
+function rr(){re=false;sc=0;if(tm){clearInterval(tm);tm=null}document.getElementById('rt').textContent='00:00';document.getElementById('rb').classList.remove('on');document.getElementById('rs').style.display='none';document.getElementById('rh').textContent='点击按钮开始录音'}
+function rc(){if(re){re=false;if(tm){clearInterval(tm);tm=null}document.getElementById('rb').classList.remove('on');document.getElementById('rs').style.display='none';document.getElementById('rh').textContent='录音已停止'}else{re=true;sc=0;document.getElementById('rb').classList.add('on');document.getElementById('rs').style.display='inline-block';document.getElementById('rh').textContent='录音中...';tm=setInterval(()=>{sc++;const m=('0'+Math.floor(sc/60)).slice(-2);const s=('0'+sc%60).slice(-2);document.getElementById('rt').textContent=m+':'+s;if(sc>=300){clearInterval(tm);g('ld')}},1000)}}
+</script></body></html>

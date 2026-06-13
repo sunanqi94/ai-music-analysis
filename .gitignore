@@ -1,0 +1,7 @@
+﻿*.pyc
+__pycache__/
+backend/ffmpeg/ffmpeg.exe
+backend_demo.html.bak
+.vscode/
+.idea/
+*.zip

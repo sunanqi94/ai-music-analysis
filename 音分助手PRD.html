@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>交互流程思维导图</title>
+<style>
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#F5F5F7;color:#1D1D1F;display:flex;justify-content:center;padding:40px}
+.mindmap{max-width:900px;width:100%}
+h1{font-size:24px;font-weight:700;text-align:center;margin-bottom:32px;background:linear-gradient(135deg,#6C5CE7,#A29BFE);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.node{position:relative;padding-left:32px;margin:4px 0;border-left:2px solid #D0D0D0}
+.root{border-left:none;padding-left:0;margin-bottom:24px}
+.root>.label{font-size:20px;font-weight:700;color:#6C5CE7;background:linear-gradient(135deg,#6C5CE7,#A29BFE);color:#fff;display:inline-block;padding:8px 20px;border-radius:12px}
+.l1>.label{font-size:16px;font-weight:600;color:#1D1D1F;padding:6px 0}
+.l2>.label{font-size:14px;font-weight:500;color:#555;padding:4px 0}
+.l3>.label{font-size:13px;color:#86868B;padding:3px 0}
+.node .label{cursor:default}
+.node .label:hover{color:#6C5CE7}
+.divider{text-align:center;color:#C8C8CC;font-size:13px;margin:12px 0;padding-left:32px}
+.divider span{background:#F5F5F7;padding:0 12px}
+</style></head>
+<body>
+<div class="mindmap">
+<h1>AI 音乐分析助手 · 交互流程</h1>
+<div class="node root"><div class="label">🎵 AI 音乐分析助手</div>
+<div class="node l1"><div class="label">1. 首页</div>
+<div class="node l2"><div class="label">操作入口</div>
+<div class="node l3"><div class="label">📁 上传音频文件 · 点击选择本地文件 (MP3/WAV/FLAC/M4A)</div></div>
+<div class="node l3"><div class="label">🎙 开始录音 · 进入录音模式</div></div></div></div>
+<div class="divider"><span>↓</span></div>
+<div class="node l1"><div class="label">2. 分析过渡页</div>
+<div class="node l2"><div class="label">自动进度动画 (约4秒)</div>
+<div class="node l3"><div class="label">🎼 正在识别音乐风格 → ✅</div></div>
+<div class="node l3"><div class="label">🎹 正在检测调性与音高 → ✅</div></div>
+<div class="node l3"><div class="label">🎸 正在分析和弦走向 → ✅</div></div>
+<div class="node l3"><div class="label">📜 正在生成乐谱 → ✅</div></div></div></div>
+<div class="divider"><span>↓</span></div>
+<div class="node l1"><div class="label">3. 概览页（分析卡片）</div>
+<div class="node l2"><div class="label">核心摘要展示</div>
+<div class="node l3"><div class="label">🎵 风格标签 + ♩ BPM + ♪ 调性</div></div>
+<div class="node l3"><div class="label">核心和弦走向 (C-G-Am-F)</div></div></div>
+<div class="node l2"><div class="label">四个详细入口（点击箭头进入）</div>
+<div class="node l3"><div class="label">🎼 风格分析 → 风格详情页</div></div>
+<div class="node l3"><div class="label">🎹 调性与音高 → 调性详情页</div></div>
+<div class="node l3"><div class="label">🎸 和弦走向 → 和弦详情页</div></div>
+<div class="node l3"><div class="label">📜 五线谱/简谱 → 乐谱详情页</div></div></div></div>
+<div class="divider"><span>↓ 点击返回概览</span></div>
+<div class="node l1"><div class="label">4. 详细页面 × 4</div>
+<div class="node l2"><div class="label">🎼 风格分析</div>
+<div class="node l3"><div class="label">主要风格标签 + 置信度</div></div>
+<div class="node l3"><div class="label">风格分布百分比条形图</div></div>
+<div class="node l3"><div class="label">分析要点文本</div></div></div>
+<div class="node l2"><div class="label">🎹 调性与音高</div>
+<div class="node l3"><div class="label">主调标签 (C大调) + 关系小调</div></div>
+<div class="node l3"><div class="label">音域范围显示 (C3~C5)</div></div>
+<div class="node l3"><div class="label">各音级出现频率条形图</div></div></div>
+<div class="node l2"><div class="label">🎸 和弦走向</div>
+<div class="node l3"><div class="label">和弦序列标签排列</div></div>
+<div class="node l3"><div class="label">和弦时序彩色条 + 时间轴</div></div>
+<div class="node l3"><div class="label">分析要点文本</div></div></div>
+<div class="node l2"><div class="label">📜 乐谱</div>
+<div class="node l3"><div class="label">五线谱 / 简谱 切换标签</div></div>
+<div class="node l3"><div class="label">旋律摘要 + 节拍/速度</div></div>
+<div class="node l3"><div class="label">导出按钮：PDF / MIDI</div></div></div></div>
+<div class="divider"><span>↩ 随时返回首页</span></div>
+<div class="node l1"><div class="label">5. 录音模式（独立分支）</div>
+<div class="node l2"><div class="label">点击录音按钮 → 红色脉冲动画</div></div>
+<div class="node l2"><div class="label">实时计时器 00:00 ~ 05:00</div></div>
+<div class="node l2"><div class="label">波形动画</div></div>
+<div class="node l2"><div class="label">点击停止 → 自动跳转分析过渡页</div></div></div>
+</div>
+</div>
+</body>
+</html>

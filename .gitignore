@@ -1,7 +1,24 @@
-﻿*.pyc
+﻿# Python
+*.pyc
 __pycache__/
-backend/ffmpeg/ffmpeg.exe
-backend_demo.html.bak
+*.pyo
+*.egg-info/
+
+# IDE
 .vscode/
 .idea/
+*.swp
+*.swo
+
+# Project-specific
+backend/ffmpeg/ffmpeg.exe
+backend_demo.html.bak
 *.zip
+
+# Temp files from revert/repair scripts
+_*.py
+_*.txt
+
+# OS files
+Thumbs.db
+.DS_Store

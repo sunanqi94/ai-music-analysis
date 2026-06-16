@@ -60,14 +60,25 @@ def load_audio(path):
     except:
         return _load_with_ffmpeg(path, ext)
 
+def _find_ffmpeg_cmd():
+    if os.path.isfile(FFMPEG_PATH):
+        return FFMPEG_PATH
+    try:
+        import shutil
+        cmd = shutil.which("ffmpeg")
+        if cmd:
+            return cmd
+    except:
+        pass
+    try:
+        from imageio_ffmpeg import get_ffmpeg_exe
+        return get_ffmpeg_exe()
+    except:
+        pass
+    return None
+
 def _load_with_ffmpeg(path, ext):
-    ffmpeg_cmd = FFMPEG_PATH
-    if not os.path.isfile(ffmpeg_cmd):
-        try:
-            import shutil
-            ffmpeg_cmd = shutil.which("ffmpeg")
-        except:
-            ffmpeg_cmd = None
+    ffmpeg_cmd = _find_ffmpeg_cmd()
     if not ffmpeg_cmd:
         raise RuntimeError('ffmpeg not found. Cannot decode ' + ext + ' files.')
     tmp = os.path.join(tempfile.gettempdir(), 'codex_decode_%s_%s.wav' % (os.getpid(), os.path.basename(path)))
@@ -89,11 +100,7 @@ def _load_with_ffmpeg(path, ext):
             except: pass
 
 def supported_formats():
-    try:
-        import shutil
-        has_ffmpeg = os.path.isfile(FFMPEG_PATH) or shutil.which("ffmpeg") is not None
-    except:
-        has_ffmpeg = os.path.isfile(FFMPEG_PATH)
+    has_ffmpeg = _find_ffmpeg_cmd() is not None
     basic = ['WAV', 'FLAC', 'OGG']
     extended = ['MP3', 'M4A', 'AAC', 'WMA', 'AIFF', 'MP2', 'AC3', 'AMR']
     additional = ['MP3', 'M4A', 'M4R', 'AAC', 'WMA', 'AIFF', 'MP2', 'AC3', 'AMR', '3GP', 'OGV', 'WEBM']

@@ -96,8 +96,9 @@ def supported_formats():
         has_ffmpeg = os.path.isfile(FFMPEG_PATH)
     basic = ['WAV', 'FLAC', 'OGG']
     extended = ['MP3', 'M4A', 'AAC', 'WMA', 'AIFF', 'MP2', 'AC3', 'AMR']
+    additional = ['MP3', 'M4A', 'M4R', 'AAC', 'WMA', 'AIFF', 'MP2', 'AC3', 'AMR', '3GP', 'OGV', 'WEBM']
     if has_ffmpeg:
-        return basic + extended, True
+        return basic + additional, True
     return basic, False
 
 def _build_chroma_filterbank(sr, n_fft=4096, sigma=0.5):

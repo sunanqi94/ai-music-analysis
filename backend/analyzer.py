@@ -9,7 +9,11 @@ GENRES = ['Pop','Rock','Jazz','Classical','Electronic','Folk','R&B','Hip Hop','M
 KEY_MAJOR = np.array([6.35,2.23,3.48,2.33,4.38,4.09,2.52,5.19,2.39,3.66,2.29,2.88])
 KEY_MINOR = np.array([6.33,2.68,3.52,5.38,2.60,3.53,2.54,4.75,3.98,2.69,3.34,3.17])
 FREQ_BANDS = [(20,60),(60,120),(120,250),(250,500),(500,1000),(1000,2000),(2000,4000),(4000,8000)]
-FFMPEG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ffmpeg", "ffmpeg.exe")
+FFMPEG_DIR = os.path.dirname(os.path.abspath(__file__))
+if os.name == 'nt':
+    FFMPEG_PATH = os.path.join(FFMPEG_DIR, "ffmpeg", "ffmpeg.exe")
+else:
+    FFMPEG_PATH = os.path.join(FFMPEG_DIR, "ffmpeg", "ffmpeg") if os.path.isfile(os.path.join(FFMPEG_DIR, "ffmpeg", "ffmpeg")) else "ffmpeg"
 
 def _build_chord_library():
     def maj(b):    v=np.zeros(12); v[b%12]=1; v[(b+4)%12]=1; v[(b+7)%12]=1; return v
@@ -57,12 +61,22 @@ def load_audio(path):
         return _load_with_ffmpeg(path, ext)
 
 def _load_with_ffmpeg(path, ext):
-    if not os.path.isfile(FFMPEG_PATH):
-        raise RuntimeError('ffmpeg not found at ' + FFMPEG_PATH + '. Cannot decode ' + ext + ' files.')
+    ffmpeg_cmd = FFMPEG_PATH
+    if not os.path.isfile(ffmpeg_cmd):
+        try:
+            import shutil
+            ffmpeg_cmd = shutil.which("ffmpeg")
+        except:
+            ffmpeg_cmd = None
+    if not ffmpeg_cmd:
+        raise RuntimeError('ffmpeg not found. Cannot decode ' + ext + ' files.')
     tmp = os.path.join(tempfile.gettempdir(), 'codex_decode_%s_%s.wav' % (os.getpid(), os.path.basename(path)))
     try:
-        cmd = [FFMPEG_PATH, '-y', '-i', path, '-ac', '1', '-ar', '44100', '-sample_fmt', 's16', '-f', 'wav', tmp]
-        r = subprocess.run(cmd, capture_output=True, timeout=60, creationflags=subprocess.CREATE_NO_WINDOW)
+        cmd = [ffmpeg_cmd, '-y', '-i', path, '-ac', '1', '-ar', '44100', '-sample_fmt', 's16', '-f', 'wav', tmp]
+        kwargs = {'capture_output': True, 'timeout': 60}
+        if os.name == 'nt':
+            kwargs['creationflags'] = subprocess.CREATE_NO_WINDOW
+        r = subprocess.run(cmd, **kwargs)
         if r.returncode != 0:
             raise RuntimeError('ffmpeg failed: ' + r.stderr.decode('utf-8', errors='replace')[:200])
         from scipy.io import wavfile
@@ -75,7 +89,11 @@ def _load_with_ffmpeg(path, ext):
             except: pass
 
 def supported_formats():
-    has_ffmpeg = os.path.isfile(FFMPEG_PATH)
+    try:
+        import shutil
+        has_ffmpeg = os.path.isfile(FFMPEG_PATH) or shutil.which("ffmpeg") is not None
+    except:
+        has_ffmpeg = os.path.isfile(FFMPEG_PATH)
     basic = ['WAV', 'FLAC', 'OGG']
     extended = ['MP3', 'M4A', 'AAC', 'WMA', 'AIFF', 'MP2', 'AC3', 'AMR']
     if has_ffmpeg:
